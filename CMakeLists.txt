@@ -13,20 +13,25 @@ set(VKFFT_BACKEND 3 CACHE STRING "0 - Vulkan, 1 - CUDA, 2 - HIP, 3 - OpenCL")
 if(${VKFFT_BACKEND} EQUAL 1)
 # pass
 elseif(${VKFFT_BACKEND} EQUAL 3)
+find_package(OpenCL REQUIRED)
 ## When this module is loaded by an app, load OpenCL too.
 set(VkFFTBackend_EXPORT_CODE_INSTALL "
-set(OpenCL_DIR \"${OpenCL_DIR}\")
+set(OpenCL_INCLUDE_DIR \"${OpenCL_INCLUDE_DIR}\")
+set(OpenCL_LIBRARY \"${OpenCL_LIBRARY}\")
 find_package(OpenCL REQUIRED)
 ")
 set(VkFFTBackend_EXPORT_CODE_BUILD "
 if(NOT ITK_BINARY_DIR)
-  set(OpenCL_DIR \"${OpenCL_DIR}\")
+  set(OpenCL_INCLUDE_DIR \"${OpenCL_INCLUDE_DIR}\")
+  set(OpenCL_LIBRARY \"${OpenCL_LIBRARY}\")
   find_package(OpenCL REQUIRED)
 endif()
 ")
 set(VkFFTBackend_SYSTEM_INCLUDE_DIRS ${OpenCL_INCLUDE_DIRS})
-get_filename_component(OpenCL_LIB_DIR ${OpenCL_LIBRARY} DIRECTORY)
-set(VkFFTBackend_SYSTEM_LIBRARY_DIRS ${OpenCL_LIB_DIR})
+if (OpenCL_LIBRARY)
+  get_filename_component(OpenCL_LIB_DIR ${OpenCL_LIBRARY} DIRECTORY)
+  set(VkFFTBackend_SYSTEM_LIBRARY_DIRS ${OpenCL_LIB_DIR})
+endif()
 endif()
 
 ## VkFFT dependency
